@@ -1,8 +1,9 @@
-fastapi==0.78.0
-uvicorn==0.18.2
-scikit-learn==1.2.2
-pandas==1.3.5
-numpy==1.21.5
-joblib==1.1.0
-matplotlib==3.5.1
-seaborn==0.11.2
+pandas
+numpy
+matplotlib
+seaborn
+scikit-learn
+joblib
+fastapi
+pydantic
+uvicorn
