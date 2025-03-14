@@ -18,7 +18,7 @@ The API is containerized using Docker and is hosted on **Render** for public acc
 
 - **Pre-trained Model and Scaler**:  
   The trained model (`model.pkl`) and scaler (`scaler.pkl`) files are available for quick evaluation.  
-  **Download Link**: [Google Drive Model Artifacts]([https://drive.google.com/placeholder_link](https://drive.google.com/file/d/19cVR5WxiP_DWueXdb6A6GBDIOfEG4h77/view?usp=sharing)) 
+  **Download Link**: [Google Drive Model Artifacts](https://drive.google.com/file/d/19cVR5WxiP_DWueXdb6A6GBDIOfEG4h77/view?usp=sharing)
 
 ## How to Run the Project
 
