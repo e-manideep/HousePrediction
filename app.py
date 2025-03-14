@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
 import joblib
 import numpy as np
@@ -28,12 +29,99 @@ class HouseFeatures(BaseModel):
     Latitude: float
     Longitude: float
 
-@app.get("/")
+@app.get("/", response_class=HTMLResponse)
 def read_root():
     """
-    Basic health-check endpoint.
+    Returns a simple UI for predicting house prices.
     """
-    return {"message": "Welcome to the House Price Prediction API. Use the /predict endpoint to get predictions."}
+    html_content = """
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>House Price Prediction UI</title>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+        <style>
+            body { margin-top: 50px; background-color: #f8f9fa; }
+            .container { max-width: 600px; }
+            h1 { text-align: center; margin-bottom: 30px; }
+            .result { margin-top: 20px; }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>House Price Prediction</h1>
+            <form id="predictionForm">
+                <div class="form-group">
+                    <label for="MedInc">Median Income (MedInc):</label>
+                    <input type="number" step="any" class="form-control" id="MedInc" placeholder="Enter median income" required>
+                </div>
+                <div class="form-group">
+                    <label for="HouseAge">House Age:</label>
+                    <input type="number" step="any" class="form-control" id="HouseAge" placeholder="Enter house age" required>
+                </div>
+                <div class="form-group">
+                    <label for="AveRooms">Average Rooms (AveRooms):</label>
+                    <input type="number" step="any" class="form-control" id="AveRooms" placeholder="Enter average rooms" required>
+                </div>
+                <div class="form-group">
+                    <label for="AveBedrms">Average Bedrooms (AveBedrms):</label>
+                    <input type="number" step="any" class="form-control" id="AveBedrms" placeholder="Enter average bedrooms" required>
+                </div>
+                <div class="form-group">
+                    <label for="Population">Population:</label>
+                    <input type="number" step="any" class="form-control" id="Population" placeholder="Enter population" required>
+                </div>
+                <div class="form-group">
+                    <label for="AveOccup">Average Occupancy (AveOccup):</label>
+                    <input type="number" step="any" class="form-control" id="AveOccup" placeholder="Enter average occupancy" required>
+                </div>
+                <div class="form-group">
+                    <label for="Latitude">Latitude:</label>
+                    <input type="number" step="any" class="form-control" id="Latitude" placeholder="Enter latitude" required>
+                </div>
+                <div class="form-group">
+                    <label for="Longitude">Longitude:</label>
+                    <input type="number" step="any" class="form-control" id="Longitude" placeholder="Enter longitude" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Predict Price</button>
+            </form>
+            <div id="result" class="alert alert-info result" style="display:none;"></div>
+        </div>
+        
+        <script>
+            document.getElementById("predictionForm").addEventListener("submit", async function(e) {
+                e.preventDefault();
+                const data = {
+                    MedInc: parseFloat(document.getElementById("MedInc").value),
+                    HouseAge: parseFloat(document.getElementById("HouseAge").value),
+                    AveRooms: parseFloat(document.getElementById("AveRooms").value),
+                    AveBedrms: parseFloat(document.getElementById("AveBedrms").value),
+                    Population: parseFloat(document.getElementById("Population").value),
+                    AveOccup: parseFloat(document.getElementById("AveOccup").value),
+                    Latitude: parseFloat(document.getElementById("Latitude").value),
+                    Longitude: parseFloat(document.getElementById("Longitude").value)
+                };
+
+                try {
+                    const response = await fetch("/predict", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(data)
+                    });
+                    
+                    const result = await response.json();
+                    document.getElementById("result").style.display = "block";
+                    document.getElementById("result").innerHTML = "<strong>Predicted House Price:</strong> $" + result.predicted_house_price.toFixed(2);
+                } catch (error) {
+                    document.getElementById("result").style.display = "block";
+                    document.getElementById("result").innerHTML = "<strong>Error:</strong> " + error;
+                }
+            });
+        </script>
+    </body>
+    </html>
+    """
+    return HTMLResponse(content=html_content, status_code=200)
 
 @app.post("/predict")
 def predict_price(features: HouseFeatures):
